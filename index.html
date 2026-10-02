@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0F1B2D" />
+<title>MUSA · Relatório de Turno</title>
+<meta name="description" content="Plataforma da MUSA para registro de disponibilidade de equipamentos e operadores do turno de mineração." />
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="icons/icon.svg" />
+<style>
+:root{
+  --navy: #0F1B2D;
+  --navy-2: #16233A;
+  --orange: #FF7A29;
+  --orange-dark: #E36313;
+  --slate: #4A5568;
+  --green: #1E9E5A;
+  --green-bg: #E5F7ED;
+  --red: #D64545;
+  --red-bg: #FBEAEA;
+  --amber: #C98A0A;
+  --amber-bg: #FBF1DD;
+  --bg: #F3F5F8;
+  --card-bg: #FFFFFF;
+  --text: #1B2430;
+  --text-muted: #6B7686;
+  --border: #E1E5EB;
+  --whatsapp: #25D366;
+  --radius: 14px;
+  --shadow: 0 2px 10px rgba(15,27,45,0.08);
+  color-scheme: light;
+}
+
+[data-theme="dark"]{
+  --bg: #0B121F;
+  --card-bg: #131F33;
+  --text: #EAF0F7;
+  --text-muted: #93A1B5;
+  --border: #223250;
+  --green-bg: #103524;
+  --red-bg: #3A1717;
+  --amber-bg: #3A2C0C;
+  color-scheme: dark;
+}
+
+*{ box-sizing: border-box; }
+html,body{ margin:0; padding:0; }
+body{
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  padding-bottom: 40px;
+}
+
+/* HEADER */
+.app-header{
+  position: sticky; top:0; z-index: 20;
+  background: var(--navy);
+  color: #fff;
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 14px 16px;
+  box-shadow: var(--shadow);
+}
+.brand{ display:flex; align-items:center; gap:10px; }
+.brand-mark{
+  width:38px; height:38px; border-radius:10px;
+  background: var(--orange);
+  display:flex; align-items:center; justify-content:center;
+  font-weight:800; font-size:15px; color:#161616; letter-spacing:0.5px;
+}
+.brand-text{ display:flex; flex-direction:column; line-height:1.15; }
+.brand-text strong{ font-size:15px; }
+.brand-text small{ font-size:11px; color:#B9C4D3; }
+.brand-divider{ color: var(--orange); font-weight:400; margin: 0 2px; }
+.conn-status{
+  font-size: 10px; color: var(--green); align-self:center; margin-right: 2px;
+  transition: color 0.2s;
+}
+.conn-status.offline{ color: var(--red); }
+.header-actions{ display:flex; gap:6px; align-items:center; }
+.icon-btn{
+  background: rgba(255,255,255,0.08);
+  border:none; color:#fff; width:38px; height:38px; border-radius:10px;
+  font-size:17px; display:flex; align-items:center; justify-content:center;
+}
+.icon-btn:active{ background: rgba(255,255,255,0.18); }
+
+main{ max-width: 720px; margin: 0 auto; padding: 14px; }
+
+.stats-strip{ display:flex; gap:10px; margin: 0 0 14px 0; }
+.stat-item{
+  flex:1; background: var(--card-bg); border: 1px solid var(--border);
+  border-radius: 12px; padding: 12px 10px; text-align:center;
+  box-shadow: var(--shadow);
+}
+.stat-value{ display:block; font-size: 20px; font-weight: 800; color: var(--navy); }
+[data-theme="dark"] .stat-value{ color: #fff; }
+.stat-label{ display:block; font-size: 10.5px; color: var(--text-muted); margin-top: 2px; }
+
+/* CARDS */
+.card{
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px;
+  margin-bottom: 14px;
+}
+.card-title{
+  font-size: 15px; text-transform: uppercase; letter-spacing: 0.6px;
+  color: var(--slate);
+  margin: 0 0 12px 0;
+  border-left: 4px solid var(--orange);
+  padding-left: 10px;
+}
+[data-theme="dark"] .card-title{ color: var(--text-muted); }
+
+/* FIELDS */
+.field{ margin-bottom: 14px; }
+.field:last-child{ margin-bottom: 0; }
+.field label{
+  display:block; font-size: 13px; font-weight:600; margin-bottom:6px; color: var(--text);
+}
+.req{ color: var(--red); }
+input[type="text"], input[type="date"], textarea, select{
+  width:100%; padding: 13px 12px; border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 16px;
+  font-family: inherit;
+}
+textarea{ resize: vertical; min-height: 110px; }
+input:focus, textarea:focus{ outline: none; border-color: var(--orange); }
+input.field-error, textarea.field-error, .segmented.field-error{ border-color: var(--red) !important; }
+
+/* SEGMENTED CONTROL */
+.segmented{ display:flex; gap:8px; flex-wrap: wrap; }
+.segmented.grid-2 .seg-btn{ flex: 1 1 calc(50% - 4px); }
+.seg-btn{
+  flex:1; min-width: 60px; padding: 12px 0; border-radius: 10px;
+  border: 1.5px solid var(--border); background: var(--bg); color: var(--text);
+  font-size:16px; font-weight:700;
+}
+.seg-btn.active{ background: var(--orange); border-color: var(--orange); color:#fff; }
+.seg-btn.seg-btn-wide{ font-size: 13.5px; padding: 12px 8px; }
+
+/* EQUIPMENT GROUPS */
+.equip-group{ margin-bottom: 18px; }
+.equip-group:last-child{ margin-bottom: 0; }
+.equip-placeholder{
+  color: var(--text-muted); font-size: 14px; text-align:center;
+  padding: 24px 12px; border: 1.5px dashed var(--border); border-radius: 10px;
+}
+.equip-group-title{
+  font-size: 13px; font-weight: 800; letter-spacing: 0.4px;
+  color: #fff; background: var(--slate);
+  padding: 8px 12px; border-radius: 8px; margin-bottom: 10px;
+  display:flex; align-items:center; justify-content: space-between;
+}
+.equip-group-count{ font-weight: 600; font-size:12px; opacity:0.85; }
+
+.equip-row{
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  background: var(--bg);
+}
+.equip-row.status-disponivel{ border-color: var(--green); background: var(--green-bg); }
+.equip-row.status-manutencao{ border-color: var(--red); background: var(--red-bg); }
+.equip-row.status-sem-operador{ border-color: var(--amber); background: var(--amber-bg); }
+
+.equip-row-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+.equip-code{ font-weight: 800; font-size: 16px; letter-spacing: 0.3px; }
+
+.status-toggle{ display:flex; gap:8px; flex-wrap: wrap; }
+.status-btn{
+  flex: 1 1 auto;
+  padding: 11px 12px; border-radius: 10px; font-size: 12.5px; font-weight:700;
+  border: 1.5px solid var(--border); background: var(--card-bg); color: var(--text);
+  white-space: nowrap;
+}
+.status-btn.disp.active{ background: var(--green); border-color: var(--green); color:#fff; }
+.status-btn.manut.active{ background: var(--red); border-color: var(--red); color:#fff; }
+.status-btn.sem.active{ background: var(--amber); border-color: var(--amber); color:#fff; }
+
+.operator-field{ margin-top: 4px; }
+.operator-field input{ background: var(--card-bg); }
+.operator-field textarea{ background: var(--card-bg); min-height: 60px; }
+.hidden{ display:none !important; }
+
+/* BUTTONS */
+.btn{
+  border:none; border-radius: 12px; font-weight: 700; font-size: 16px;
+  padding: 15px 18px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;
+}
+.btn-block{ width:100%; }
+.btn-lg{ padding: 17px 18px; font-size: 17px; }
+.btn-sm{ padding: 9px 12px; font-size: 13px; }
+.btn-primary{ background: var(--orange); color:#fff; }
+.btn-primary:active{ background: var(--orange-dark); }
+.btn-whatsapp{ background: var(--whatsapp); color:#fff; margin-top: 10px; }
+.btn-ghost{ background: transparent; color: var(--text); border: 1.5px solid var(--border); margin-top: 10px; }
+
+.submit-bar{ margin-top: 6px; margin-bottom: 20px; }
+
+/* RESULT */
+.result-card{ text-align:center; }
+.result-icon{ font-size: 42px; margin-bottom: 6px; }
+.result-summary{ color: var(--text-muted); font-size: 14px; margin-bottom: 16px; white-space: pre-line; }
+
+/* HISTORY */
+.history-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom: 12px; }
+.history-header .card-title{ margin:0; }
+.history-list{ display:flex; flex-direction:column; gap:10px; }
+.history-item{
+  border:1.5px solid var(--border); border-radius:10px; padding:12px;
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+}
+.history-item-info strong{ display:block; font-size:14px; }
+.history-item-info small{ color: var(--text-muted); font-size:12px; }
+.history-item-actions{ display:flex; gap:6px; }
+.history-empty{ color: var(--text-muted); font-size:14px; text-align:center; padding: 20px 0; }
+
+/* TOAST */
+.toast{
+  position: fixed; left:50%; bottom: 22px; transform: translateX(-50%);
+  background: var(--navy); color:#fff; padding: 12px 18px; border-radius: 10px;
+  font-size: 14px; box-shadow: var(--shadow); z-index: 50; max-width: 90vw; text-align:center;
+}
+
+@media (min-width: 760px){
+  .equip-groups-grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+}
+
+/* FOOTER */
+.app-footer{
+  text-align:center; color: var(--text-muted); font-size: 11.5px;
+  padding: 18px 10px 6px; display:flex; align-items:center; justify-content:center;
+  gap: 6px; flex-wrap: wrap;
+}
+.app-footer-sep{ opacity: 0.5; }
+</style>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="brand">
+    <span class="brand-mark">M</span>
+    <div class="brand-text">
+      <strong>MUSA <span class="brand-divider">·</span> Relatório de Turno</strong>
+      <small>Plataforma de Operação de Mina</small>
+    </div>
+  </div>
+  <div class="header-actions">
+    <span id="connStatus" class="conn-status" title="Status da conexão">●</span>
+    <button id="historyBtn" class="icon-btn" title="Histórico" aria-label="Histórico">🕘</button>
+    <button id="themeBtn" class="icon-btn" title="Alternar tema" aria-label="Alternar tema">🌙</button>
+  </div>
+</header>
+
+<main id="mainView">
+
+  <section class="stats-strip" id="statsStrip" aria-label="Indicadores gerais">
+    <div class="stat-item">
+      <span class="stat-value" id="statTotal">—</span>
+      <span class="stat-label">Relatórios na nuvem</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-value" id="statHoje">—</span>
+      <span class="stat-label">Enviados hoje</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-value" id="statContratos">6</span>
+      <span class="stat-label">Contratos ativos</span>
+    </div>
+  </section>
+
+  <form id="reportForm" novalidate>
+
+    <!-- DADOS DO TURNO -->
+    <section class="card">
+      <h2 class="card-title">Dados do Turno</h2>
+
+      <div class="field">
+        <label>Contrato <span class="req">*</span></label>
+        <div class="segmented grid-2" id="contratoGroup" role="radiogroup" aria-label="Contrato">
+          <button type="button" class="seg-btn seg-btn-wide" data-value="decanter">Decanter</button>
+          <button type="button" class="seg-btn seg-btn-wide" data-value="momc">MOMC</button>
+          <button type="button" class="seg-btn seg-btn-wide" data-value="ouro_negro">Ouro Negro</button>
+          <button type="button" class="seg-btn seg-btn-wide" data-value="retaludamento">Retaludamento</button>
+          <button type="button" class="seg-btn seg-btn-wide" data-value="peneira3">Peneira 3</button>
+          <button type="button" class="seg-btn seg-btn-wide" data-value="peneira4">Peneira 4</button>
+        </div>
+        <input type="hidden" id="contratoField" name="contrato" required>
+      </div>
+
+      <div class="field">
+        <label for="dataField">Data <span class="req">*</span></label>
+        <input type="date" id="dataField" name="data" required>
+      </div>
+
+      <div class="field">
+        <label>Horário do Turno <span class="req">*</span></label>
+        <div class="segmented" id="horarioGroup" role="radiogroup" aria-label="Horário do Turno">
+          <button type="button" class="seg-btn seg-btn-wide" data-value="07:00 às 19:00">07:00 às 19:00</button>
+          <button type="button" class="seg-btn seg-btn-wide" data-value="19:00 às 07:00">19:00 às 07:00</button>
+        </div>
+        <input type="hidden" id="horarioField" name="horario" required>
+      </div>
+
+      <div class="field">
+        <label>Turma <span class="req">*</span></label>
+        <div class="segmented" id="turmaGroup" role="radiogroup" aria-label="Turma">
+          <button type="button" class="seg-btn" data-value="A">A</button>
+          <button type="button" class="seg-btn" data-value="B">B</button>
+          <button type="button" class="seg-btn" data-value="C">C</button>
+          <button type="button" class="seg-btn" data-value="D">D</button>
+        </div>
+        <input type="hidden" id="turmaField" name="turma" required>
+      </div>
+
+      <div class="field">
+        <label for="encarregadoField">Nome do Encarregado <span class="req">*</span></label>
+        <input type="text" id="encarregadoField" name="encarregado" placeholder="Digite o nome completo" autocomplete="name" required>
+      </div>
+    </section>
+
+    <!-- EQUIPAMENTOS -->
+    <section class="card equip-card">
+      <h2 class="card-title">Controle de Equipamentos</h2>
+      <div id="equipGroups"><!-- gerado via JS --></div>
+    </section>
+
+    <!-- OBSERVAÇÕES -->
+    <section class="card">
+      <h2 class="card-title">Principais Observações do Turno</h2>
+      <div class="field">
+        <textarea id="obsField" name="observacoes" rows="6"
+          placeholder="Problemas operacionais, equipamentos parados, condições climáticas, troca de operadores, informações relevantes do turno..."></textarea>
+      </div>
+    </section>
+
+    <div class="submit-bar">
+      <button type="submit" class="btn btn-primary btn-block btn-lg" id="finalizeBtn">
+        Finalizar Relatório
+      </button>
+    </div>
+  </form>
+
+  <!-- TELA DE RESULTADO PÓS-GERAÇÃO -->
+  <section class="card result-card hidden" id="resultCard">
+    <div class="result-icon">✅</div>
+    <h2 class="card-title">Relatório Gerado</h2>
+    <p id="resultSummary" class="result-summary"></p>
+    <div class="result-actions">
+      <button class="btn btn-whatsapp btn-block btn-lg" id="shareWhatsBtn">📤 Compartilhar no WhatsApp</button>
+      <button class="btn btn-ghost btn-block" id="copyTextBtn">📋 Copiar Texto</button>
+      <button class="btn btn-ghost btn-block" id="newReportBtn">Novo Relatório</button>
+    </div>
+  </section>
+
+  <!-- HISTÓRICO -->
+  <section class="card hidden" id="historyCard">
+    <div class="history-header">
+      <h2 class="card-title">Histórico de Turnos</h2>
+      <div style="display:flex; gap:6px;">
+        <button class="btn btn-ghost btn-sm" id="exportJsonBtn" title="Exportar dados para Power BI / análise">Exportar JSON</button>
+        <button class="btn btn-ghost btn-sm" id="closeHistoryBtn">Fechar</button>
+      </div>
+    </div>
+    <div id="historyList" class="history-list"></div>
+  </section>
+
+  <footer class="app-footer">
+    <span>MUSA · Plataforma de Relatório de Turno</span>
+    <span class="app-footer-sep">·</span>
+    <span>Dados armazenados na nuvem (Firebase)</span>
+  </footer>
+
+</main>
+
+<div id="toast" class="toast hidden"></div>
+
+<script>
+/* =========================================================
+   MUSA · RELATÓRIO DE TURNO
+   ========================================================= */
+
+const CONTRACTS = [
+  {
+    id: "decanter",
+    label: "Decanter",
+    codes: ["CB4231","CB4271","CB4341","CB4391",
+            "CB4411","CB4481","ES0211","ES0215","PC0203",
+            "MN0027","CP829","TI290","TI301","TI302","TI305"]
+  },
+  {
+    id: "retaludamento",
+    label: "Retaludamento",
+    codes: ["ES0159","ES0267"]
+  },
+  {
+    id: "momc",
+    label: "MOMC",
+    codes: ["CB4061","CB4121","CB4161","CB4221","CB4251","CB4261","CB4281","CB4291","CB4301","CB4401",
+            "CB4311","CB4331","CB4351","CB4361","CB4371","CB4651","CB7001","CB7005",
+            "CB7007","CB7006","CB7004","CB7008","CB7021","CB7022","CB4201","CB7023",
+            "CB7024","CB7025","CB4191","CB4381","CB4491","CB3511","CB4421","CB4471",
+            "CB4461","CB4521","CP826","CP827","CP828","CP831","CP832","ES0181","ES0183",
+            "ES0185","ES0188","ES0201","ES0205","ES0217","ES0223","ES0233",
+            "MN0029","MN0031","MN0045","PC0163","PC0185","PC0197","PC0199","PC0201",
+            "RE0073","TE203","TE208","TE211","TI263","TI269","TI273","TI275","TI291",
+            "TI353","ES0187","ES0219"]
+  },
+  {
+    id: "ouro_negro",
+    label: "Ouro Negro",
+    codes: ["CB4051","CB4641","CB4771","CB4791","CB7015","CB7016","CB7017","CB7018",
+            "CB7019","CB7020","ES0251","ES0275","ES0286",
+            "TE209","TE210","TE213",
+            "MN0044"]
+  },
+  {
+    id: "peneira3",
+    label: "Peneira 3",
+    codes: ["ES0207","PC0187","PC0191","ES0193"]
+  },
+  {
+    id: "peneira4",
+    label: "Peneira 4",
+    codes: ["ES0191","ES0209","PC0173","PC0183"]
+  }
+];
+
+function getContract(id){
+  return CONTRACTS.find(c => c.id === id) || null;
+}
+
+/* ---------------- FIREBASE / FIRESTORE ---------------- */
+const firebaseConfig = {
+  apiKey: "AIzaSyCMr58wtbHfVn8ndb4bkA26fAJ53n4A5lo",
+  authDomain: "relatorio-de-turno---musa.firebaseapp.com",
+  projectId: "relatorio-de-turno---musa",
+  storageBucket: "relatorio-de-turno---musa.firebasestorage.app",
+  messagingSenderId: "754053859591",
+  appId: "1:754053859591:web:6130c2faafa69c9f541da2"
+};
+
+const REPORTS_COLLECTION = "relatorios_turno";
+let db = null;
+let firebaseReady = false;
+
+function initFirebase(){
+  try {
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore();
+    db.enablePersistence({ synchronizeTabs: true }).catch((err) => {
+      console.warn("Persistência offline não disponível neste navegador:", err);
+    });
+    firebaseReady = true;
+  } catch(err){
+    console.error("Falha ao iniciar o Firebase. Confira o firebaseConfig.", err);
+    firebaseReady = false;
+  }
+}
+
+let lastGeneratedForm = null;
+let currentContractId = null;
+
+async function saveReport(record){
+  if(!firebaseReady) throw new Error("Firebase não configurado (veja firebaseConfig no início do script).");
+  await db.collection(REPORTS_COLLECTION).doc(String(record.id)).set(record);
+  return record;
+}
+
+async function getAllReports(){
+  if(!firebaseReady) throw new Error("Firebase não configurado (veja firebaseConfig no início do script).");
+  const snapshot = await db.collection(REPORTS_COLLECTION).orderBy("id", "desc").limit(100).get();
+  return snapshot.docs.map(d => d.data());
+}
+
+async function deleteReport(id){
+  if(!firebaseReady) throw new Error("Firebase não configurado (veja firebaseConfig no início do script).");
+  await db.collection(REPORTS_COLLECTION).doc(String(id)).delete();
+}
+
+/* ---------------- RENDER EQUIPAMENTOS ---------------- */
+function renderEquipmentGroups(contractId){
+  const container = document.getElementById("equipGroups");
+  container.innerHTML = "";
+
+  const contract = getContract(contractId);
+  if(!contract){
+    container.innerHTML = `
+      <div class="equip-placeholder">
+        Selecione o <strong>Contrato</strong> acima para carregar a lista de equipamentos.
+      </div>`;
+    return;
+  }
+
+  const groupEl = document.createElement("div");
+  groupEl.className = "equip-group";
+  groupEl.innerHTML = `
+    <div class="equip-group-title">
+      <span>${contract.label}</span>
+      <span class="equip-group-count">${contract.codes.length} equip.</span>
+    </div>
+    <div class="equip-group-rows" data-group="${contract.id}"></div>
+  `;
+  const rowsWrap = groupEl.querySelector(".equip-group-rows");
+  contract.codes.forEach(code => {
+    const rowId = `${contract.id}_${code}`;
+    const row = document.createElement("div");
+    row.className = "equip-row";
+    row.dataset.code = code;
+    row.dataset.group = contract.id;
+    row.innerHTML = `
+      <div class="equip-row-top">
+        <span class="equip-code">${code}</span>
+      </div>
+      <div class="status-toggle">
+        <button type="button" class="status-btn disp" data-row="${rowId}" data-status="Disponível">Disponível</button>
+        <button type="button" class="status-btn sem" data-row="${rowId}" data-status="Sem Operador">Sem Operador</button>
+        <button type="button" class="status-btn manut" data-row="${rowId}" data-status="Em Manutenção">Manutenção</button>
+      </div>
+      <div class="operator-field hidden" id="opField_${rowId}">
+        <label for="op_${rowId}">Nome do Operador <span class="req">*</span></label>
+        <input type="text" id="op_${rowId}" placeholder="Digite o nome do operador" autocomplete="off">
+      </div>
+      <div class="operator-field hidden" id="motivoField_${rowId}">
+        <label for="motivo_${rowId}">Motivo da Manutenção <span class="req">*</span></label>
+        <textarea id="motivo_${rowId}" rows="2" placeholder="Descreva o motivo da manutenção"></textarea>
+      </div>
+    `;
+    rowsWrap.appendChild(row);
+  });
+  container.appendChild(groupEl);
+
+  container.querySelectorAll(".status-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const row = btn.closest(".equip-row");
+      const rowId = btn.dataset.row;
+      const status = btn.dataset.status;
+      row.querySelectorAll(".status-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      row.dataset.status = status;
+      row.classList.remove("status-disponivel","status-manutencao","status-sem-operador");
+      const opField = document.getElementById(`opField_${rowId}`);
+      const motivoField = document.getElementById(`motivoField_${rowId}`);
+      opField.classList.add("hidden");
+      motivoField.classList.add("hidden");
+      if(status === "Disponível"){
+        row.classList.add("status-disponivel");
+        opField.classList.remove("hidden");
+        document.getElementById(`motivo_${rowId}`).value = "";
+      } else if(status === "Em Manutenção"){
+        row.classList.add("status-manutencao");
+        motivoField.classList.remove("hidden");
+        document.getElementById(`op_${rowId}`).value = "";
+      } else {
+        row.classList.add("status-sem-operador");
+        document.getElementById(`op_${rowId}`).value = "";
+        document.getElementById(`motivo_${rowId}`).value = "";
+      }
+    });
+  });
+}
+
+/* ---------------- CONTRATO ---------------- */
+function setupContratoSelector(){
+  const group = document.getElementById("contratoGroup");
+  const hidden = document.getElementById("contratoField");
+  group.querySelectorAll(".seg-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const novoContrato = btn.dataset.value;
+      if(novoContrato === currentContractId) return;
+
+      const trocar = () => {
+        group.querySelectorAll(".seg-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        hidden.value = novoContrato;
+        group.classList.remove("field-error");
+        currentContractId = novoContrato;
+        renderEquipmentGroups(novoContrato);
+      };
+
+      if(currentContractId){
+        if(confirm("Trocar o contrato vai limpar o status já preenchido dos equipamentos. Continuar?")){
+          trocar();
+        }
+      } else {
+        trocar();
+      }
+    });
+  });
+}
+
+/* ---------------- SEGMENTADOS ---------------- */
+function setupSegmented(groupId, fieldId){
+  const group = document.getElementById(groupId);
+  const hidden = document.getElementById(fieldId);
+  group.querySelectorAll(".seg-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      group.querySelectorAll(".seg-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      hidden.value = btn.dataset.value;
+      group.classList.remove("field-error");
+    });
+  });
+}
+
+/* ---------------- TEMA ---------------- */
+function setupTheme(){
+  const btn = document.getElementById("themeBtn");
+  const saved = localStorage.getItem("rt_theme") || "light";
+  applyTheme(saved);
+  btn.addEventListener("click", () => {
+    const current = document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
+    const next = current === "dark" ? "light" : "dark";
+    applyTheme(next);
+    localStorage.setItem("rt_theme", next);
+  });
+}
+function applyTheme(theme){
+  if(theme === "dark"){
+    document.documentElement.setAttribute("data-theme","dark");
+    document.getElementById("themeBtn").textContent = "☀️";
+  } else {
+    document.documentElement.removeAttribute("data-theme");
+    document.getElementById("themeBtn").textContent = "🌙";
+  }
+}
+
+/* ---------------- TOAST ---------------- */
+let toastTimer = null;
+function showToast(msg){
+  const toast = document.getElementById("toast");
+  toast.textContent = msg;
+  toast.classList.remove("hidden");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.add("hidden"), 3200);
+}
+
+/* ---------------- COLETA E VALIDAÇÃO ---------------- */
+function collectFormData(){
+  const contrato = document.getElementById("contratoField").value;
+  const data = document.getElementById("dataField").value;
+  const horario = document.getElementById("horarioField").value;
+  const turma = document.getElementById("turmaField").value;
+  const encarregado = document.getElementById("encarregadoField").value.trim();
+  const observacoes = document.getElementById("obsField").value.trim();
+
+  const equipamentos = [];
+  document.querySelectorAll(".equip-row").forEach(row => {
+    const code = row.dataset.code;
+    const group = row.dataset.group;
+    const status = row.dataset.status || null;
+    let operador = "";
+    let motivoManutencao = "";
+    if(status === "Disponível"){
+      const input = document.getElementById(`op_${group}_${code}`);
+      operador = input ? input.value.trim() : "";
+    } else if(status === "Em Manutenção"){
+      const input = document.getElementById(`motivo_${group}_${code}`);
+      motivoManutencao = input ? input.value.trim() : "";
+    }
+    equipamentos.push({ code, group, status, operador, motivoManutencao });
+  });
+
+  return { contrato, data, horario, turma, encarregado, observacoes, equipamentos };
+}
+
+function validateFormData(form){
+  let valid = true;
+  const errors = [];
+
+  const contratoGroup = document.getElementById("contratoGroup");
+  if(!form.contrato){
+    contratoGroup.classList.add("field-error"); valid = false;
+    errors.push("Selecione o Contrato.");
+  } else contratoGroup.classList.remove("field-error");
+
+  const dataInput = document.getElementById("dataField");
+  if(!form.data){
+    dataInput.classList.add("field-error"); valid = false;
+    errors.push("Informe a Data do turno.");
+  } else dataInput.classList.remove("field-error");
+
+  const horarioGroup = document.getElementById("horarioGroup");
+  if(!form.horario){
+    horarioGroup.classList.add("field-error"); valid = false;
+    errors.push("Selecione o Horário do Turno.");
+  } else horarioGroup.classList.remove("field-error");
+
+  const turmaGroup = document.getElementById("turmaGroup");
+  if(!form.turma){
+    turmaGroup.classList.add("field-error"); valid = false;
+    errors.push("Selecione a Turma.");
+  } else turmaGroup.classList.remove("field-error");
+
+  const encInput = document.getElementById("encarregadoField");
+  if(!form.encarregado){
+    encInput.classList.add("field-error"); valid = false;
+    errors.push("Informe o Nome do Encarregado.");
+  } else encInput.classList.remove("field-error");
+
+  let equipStatusMissing = false;
+  let operatorMissing = false;
+  let motivoMissing = false;
+  form.equipamentos.forEach(eq => {
+    const row = document.querySelector(`.equip-row[data-group="${eq.group}"][data-code="${eq.code}"]`);
+    if(!eq.status){
+      equipStatusMissing = true;
+      row.classList.add("field-error");
+      valid = false;
+    } else {
+      row.classList.remove("field-error");
+    }
+    if(eq.status === "Disponível" && !eq.operador){
+      operatorMissing = true;
+      valid = false;
+      const input = document.getElementById(`op_${eq.group}_${eq.code}`);
+      if(input) input.classList.add("field-error");
+    } else {
+      const input = document.getElementById(`op_${eq.group}_${eq.code}`);
+      if(input) input.classList.remove("field-error");
+    }
+    if(eq.status === "Em Manutenção" && !eq.motivoManutencao){
+      motivoMissing = true;
+      valid = false;
+      const input = document.getElementById(`motivo_${eq.group}_${eq.code}`);
+      if(input) input.classList.add("field-error");
+    } else {
+      const input = document.getElementById(`motivo_${eq.group}_${eq.code}`);
+      if(input) input.classList.remove("field-error");
+    }
+  });
+  if(equipStatusMissing) errors.push("Selecione o status de todos os equipamentos.");
+  if(operatorMissing) errors.push("Informe o nome do operador para equipamentos disponíveis.");
+  if(motivoMissing) errors.push("Informe o motivo da manutenção para os equipamentos em manutenção.");
+
+  return { valid, errors };
+}
+
+function formatDateBR(isoDate){
+  if(!isoDate) return "";
+  const [y,m,d] = isoDate.split("-");
+  return `${d}/${m}/${y}`;
+}
+
+function buildReportText(form){
+  const contract = getContract(form.contrato);
+  const equipContrato = form.equipamentos.filter(eq => eq.group === (contract ? contract.id : form.contrato));
+
+  const totals = {};
+  equipContrato.forEach(eq => {
+    const match = eq.code.match(/^[A-Za-zÀ-ÿ]+/);
+    const prefix = match ? match[0].toUpperCase() : eq.code;
+    if(!totals[prefix]) totals[prefix] = { total: 0, df: 0, uf: 0 };
+    totals[prefix].total++;
+    if(eq.status === "Disponível" || eq.status === "Sem Operador") totals[prefix].df++;
+    if(eq.status === "Disponível") totals[prefix].uf++;
+  });
+  const prefixesOrdenados = Object.keys(totals).sort();
+
+  const lines = [];
+  lines.push("*RELATÓRIO DE TURNO - OPERAÇÃO DE MINA*");
+  lines.push(`Contrato: ${contract ? contract.label : form.contrato}`);
+  lines.push(`Data: ${formatDateBR(form.data)}`);
+  lines.push(`Horário: ${form.horario}`);
+  lines.push(`Turma: ${form.turma}`);
+  lines.push(`Encarregado: ${form.encarregado}`);
+
+  if(prefixesOrdenados.length){
+    lines.push("");
+    lines.push("*Disponibilidade por grupo:*");
+    lines.push(`DF (Disp. + Sem Operador): ${prefixesOrdenados.map(p => `${p} ${totals[p].df}/${totals[p].total}`).join(" · ")}`);
+    lines.push(`UF (Disponível): ${prefixesOrdenados.map(p => `${p} ${totals[p].uf}/${totals[p].total}`).join(" · ")}`);
+  }
+
+  lines.push("");
+  lines.push("*Equipamentos:*");
+  equipContrato.forEach(eq => {
+    let linha = `${eq.code}: ${eq.status || "-"}`;
+    if(eq.status === "Disponível" && eq.operador) linha += ` (${eq.operador})`;
+    if(eq.status === "Em Manutenção" && eq.motivoManutencao) linha += ` — ${eq.motivoManutencao}`;
+    lines.push(linha);
+  });
+
+  lines.push("");
+  lines.push("*Observações:*");
+  lines.push(form.observacoes || "Sem observações registradas.");
+
+  const emissao = new Date();
+  lines.push("");
+  lines.push(`Emitido em: ${emissao.toLocaleDateString("pt-BR")} ${emissao.toLocaleTimeString("pt-BR")}`);
+
+  return lines.join("\n");
+}
+
+/* ---------------- FLUXO PRINCIPAL ---------------- */
+function setupForm(){
+  document.getElementById("reportForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const form = collectFormData();
+    const { valid, errors } = validateFormData(form);
+    if(!valid){
+      showToast(errors[0] || "Preencha todos os campos obrigatórios.");
+      const firstError = document.querySelector(".field-error");
+      if(firstError) firstError.scrollIntoView({ behavior:"smooth", block:"center" });
+      return;
+    }
+
+    const finalizeBtn = document.getElementById("finalizeBtn");
+    finalizeBtn.disabled = true;
+    finalizeBtn.textContent = "Salvando...";
+
+    try {
+      const record = {
+        id: Date.now(),
+        contrato: form.contrato,
+        data: form.data,
+        horario: form.horario,
+        turma: form.turma,
+        encarregado: form.encarregado,
+        observacoes: form.observacoes,
+        equipamentos: form.equipamentos,
+        createdAt: new Date().toISOString()
+      };
+      await saveReport(record);
+      loadStats();
+      lastGeneratedForm = form;
+
+      const disponiveis = form.equipamentos.filter(e => e.status === "Disponível").length;
+      const semOperador = form.equipamentos.filter(e => e.status === "Sem Operador").length;
+      const manutencao = form.equipamentos.filter(e => e.status === "Em Manutenção").length;
+      const contratoLabel = getContract(form.contrato)?.label || form.contrato;
+
+      document.getElementById("resultSummary").textContent =
+        `Contrato ${contratoLabel} · Turma ${form.turma} · ${formatDateBR(form.data)} · ${form.horario}\n` +
+        `${disponiveis} disponível(is) · ${semOperador} sem operador · ${manutencao} em manutenção\n` +
+        `Relatório salvo na nuvem.`;
+
+      document.getElementById("reportForm").classList.add("hidden");
+      document.getElementById("historyCard").classList.add("hidden");
+      document.getElementById("resultCard").classList.remove("hidden");
+      document.getElementById("resultCard").scrollIntoView({ behavior:"smooth" });
+
+    } catch(err){
+      console.error(err);
+      showToast("Erro ao salvar o relatório. Verifique sua conexão e tente novamente.");
+    } finally {
+      finalizeBtn.disabled = false;
+      finalizeBtn.textContent = "Finalizar Relatório";
+    }
+  });
+
+  document.getElementById("shareWhatsBtn").addEventListener("click", () => {
+    if(!lastGeneratedForm) return;
+    shareReportText(lastGeneratedForm);
+  });
+
+  document.getElementById("copyTextBtn").addEventListener("click", () => {
+    if(!lastGeneratedForm) return;
+    copyReportText(lastGeneratedForm);
+  });
+
+  document.getElementById("newReportBtn").addEventListener("click", () => {
+    resetForm();
+  });
+}
+
+function downloadBlob(blob, fileName){
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+
+function shareReportText(form){
+  const text = buildReportText(form);
+  const waUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+  window.open(waUrl, "_blank");
+}
+
+async function copyReportText(form){
+  const text = buildReportText(form);
+  try {
+    await navigator.clipboard.writeText(text);
+    showToast("Texto do relatório copiado.");
+  } catch(err){
+    console.warn("Falha ao copiar automaticamente, exibindo para copiar manualmente.", err);
+    window.prompt("Copie o texto abaixo (Ctrl+C ou selecionar tudo):", text);
+  }
+}
+
+function resetForm(){
+  document.getElementById("reportForm").reset();
+  document.querySelectorAll(".seg-btn").forEach(b => b.classList.remove("active"));
+  document.getElementById("turmaField").value = "";
+  document.getElementById("horarioField").value = "";
+  document.getElementById("contratoField").value = "";
+  currentContractId = null;
+  renderEquipmentGroups(null);
+  lastGeneratedForm = null;
+  document.getElementById("resultCard").classList.add("hidden");
+  document.getElementById("reportForm").classList.remove("hidden");
+  window.scrollTo({ top:0, behavior:"smooth" });
+}
+
+/* ---------------- HISTÓRICO ---------------- */
+async function renderHistory(){
+  const list = document.getElementById("historyList");
+  list.innerHTML = `<div class="history-empty">Carregando relatórios da nuvem...</div>`;
+
+  let reports = [];
+  try {
+    reports = await getAllReports();
+  } catch(err){
+    console.error(err);
+    list.innerHTML = `
+      <div class="history-empty" style="color:var(--red);">
+        Não foi possível carregar o histórico. Verifique sua conexão e o firebaseConfig.
+      </div>`;
+    return;
+  }
+
+  if(reports.length === 0){
+    list.innerHTML = `<div class="history-empty">Nenhum relatório salvo ainda.</div>`;
+    return;
+  }
+  list.innerHTML = "";
+  reports.forEach(r => {
+    const item = document.createElement("div");
+    item.className = "history-item";
+    item.innerHTML = `
+      <div class="history-item-info">
+        <strong>${getContract(r.contrato)?.label || "Contrato não informado"} · ${formatDateBR(r.data)} · Turma ${r.turma}</strong>
+        <small>${r.horario ? r.horario + " · " : ""}${r.encarregado}</small>
+      </div>
+      <div class="history-item-actions">
+        <button class="btn btn-primary btn-sm" data-action="share" data-id="${r.id}">WhatsApp</button>
+        <button class="btn btn-ghost btn-sm" data-action="delete" data-id="${r.id}">Excluir</button>
+      </div>
+    `;
+    list.appendChild(item);
+  });
+
+  list.querySelectorAll("[data-action='share']").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const id = Number(btn.dataset.id);
+      const reports = await getAllReports();
+      const record = reports.find(r => r.id === id);
+      if(!record) return;
+      shareReportText(record);
+    });
+  });
+
+  list.querySelectorAll("[data-action='delete']").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      if(!confirm("Excluir este relatório da nuvem? Essa ação não pode ser desfeita.")) return;
+      const id = Number(btn.dataset.id);
+      await deleteReport(id);
+      renderHistory();
+      showToast("Relatório excluído.");
+    });
+  });
+}
+
+function setupHistoryPanel(){
+  document.getElementById("historyBtn").addEventListener("click", async () => {
+    document.getElementById("reportForm").classList.add("hidden");
+    document.getElementById("resultCard").classList.add("hidden");
+    document.getElementById("historyCard").classList.remove("hidden");
+    await renderHistory();
+  });
+  document.getElementById("closeHistoryBtn").addEventListener("click", () => {
+    document.getElementById("historyCard").classList.add("hidden");
+    document.getElementById("reportForm").classList.remove("hidden");
+  });
+  document.getElementById("exportJsonBtn").addEventListener("click", async () => {
+    let reports = [];
+    try {
+      reports = await getAllReports();
+    } catch(err){
+      showToast("Não foi possível buscar os relatórios da nuvem.");
+      return;
+    }
+    if(reports.length === 0){ showToast("Nenhum relatório para exportar."); return; }
+    const blob = new Blob([JSON.stringify(reports, null, 2)], { type: "application/json" });
+    downloadBlob(blob, `relatorios_turno_export_${Date.now()}.json`);
+    showToast("JSON exportado (pronto para Power BI / Power Query).");
+  });
+}
+
+/* ---------------- INIT ---------------- */
+function setDefaultDate(){
+  const input = document.getElementById("dataField");
+  const today = new Date();
+  const iso = today.toISOString().slice(0,10);
+  input.value = iso;
+}
+
+function setupConnStatus(){
+  const el = document.getElementById("connStatus");
+  const update = () => {
+    const online = navigator.onLine;
+    el.classList.toggle("offline", !online);
+    el.title = online ? "Conectado — dados sincronizam em tempo real" : "Sem conexão — os envios ficam em fila e sincronizam depois";
+  };
+  window.addEventListener("online", update);
+  window.addEventListener("offline", update);
+  update();
+}
+
+async function loadStats(){
+  document.getElementById("statContratos").textContent = String(CONTRACTS.length);
+  try {
+    const reports = await getAllReports();
+    const totalEl = document.getElementById("statTotal");
+    const hojeEl = document.getElementById("statHoje");
+    const todayIso = new Date().toISOString().slice(0,10);
+    totalEl.textContent = reports.length >= 100 ? "100+" : String(reports.length);
+    hojeEl.textContent = String(reports.filter(r => r.data === todayIso).length);
+  } catch(err){
+    console.warn("Não foi possível carregar os indicadores:", err);
+    document.getElementById("statTotal").textContent = "—";
+    document.getElementById("statHoje").textContent = "—";
+  }
+}
+
+function showInitError(err){
+  console.error("Erro ao iniciar o app:", err);
+  const container = document.getElementById("equipGroups");
+  if(container){
+    container.innerHTML = `
+      <div style="padding:16px; border:1.5px solid var(--red); background:var(--red-bg); border-radius:10px; font-size:13px;">
+        <strong>Não foi possível carregar a lista de equipamentos.</strong><br>
+        Detalhe técnico: ${(err && err.message) ? err.message : String(err)}<br><br>
+        Tente: fechar e abrir o app novamente, ou atualizar a página puxando-a para baixo.
+        Se persistir, remova o atalho da tela inicial e adicione novamente.
+      </div>`;
+  }
+}
+
+function init(){
+  try {
+    initFirebase();
+    renderEquipmentGroups(null);
+    setupContratoSelector();
+    setupSegmented("turmaGroup", "turmaField");
+    setupSegmented("horarioGroup", "horarioField");
+    setupTheme();
+    setupForm();
+    setupHistoryPanel();
+    setupConnStatus();
+    setDefaultDate();
+    loadStats();
+  } catch(err){
+    showInitError(err);
+  }
+
+  if("serviceWorker" in navigator){
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("service-worker.js").catch(err => {
+        console.warn("Falha ao registrar service worker:", err);
+      });
+    });
+  }
+}
+
+window.addEventListener("error", (event) => {
+  console.error("Erro não tratado:", event.error || event.message);
+});
+
+document.addEventListener("DOMContentLoaded", init);
+</script>
+</body>
+</html>

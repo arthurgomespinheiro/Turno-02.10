@@ -1,0 +1,13 @@
+# Este arquivo configura um domínio próprio no GitHub Pages.
+#
+# Como usar:
+# 1. Apague a linha de comentário abaixo e escreva SÓ o seu domínio,
+#    sem "http://" e sem barra no final. Exemplos:
+#      turno.suaempresa.com.br
+#      relatorio.musa.com.br
+# 2. Renomeie este arquivo de "CNAME.example" para "CNAME" (sem extensão)
+#    antes de subir para o repositório.
+# 3. Veja o README.md, seção "Publicar em domínio próprio", para o passo
+#    a passo completo de configuração do DNS.
+#
+# seu-dominio-aqui.com.br

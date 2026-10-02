@@ -1,0 +1,20 @@
+{
+  "name": "MUSA - Relatório de Turno",
+  "short_name": "MUSA Turno",
+  "description": "Plataforma da MUSA para registro de disponibilidade de equipamentos e operadores do turno de mineração, com dados salvos na nuvem e compartilhamento via WhatsApp.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0F1B2D",
+  "theme_color": "#0F1B2D",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "192x192 512x512 any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
